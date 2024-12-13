@@ -1,6 +1,14 @@
-Basic application startup guide (in localhost, mvn command needed):
-- execute the following command in the same directory that the pom.xml file is (~/product): mvn clean test spring-boot:run 
+## Product Catalog Example by MARG91 - Spring Boot 
+
+### Basic application startup guide (in localhost, mvn command needed):
+execute the following command in the same directory that the pom.xml file is (~/product):
+
+		mvn clean test spring-boot:run
+  
 this command is to ensure that the tests compiled files are cleaned first, then recompiled and executed, before starting the spring boot server
+
+
+### OpenAPI / Swagger:
 
 OpenApi:
 http://localhost:8080/api-docs
@@ -8,7 +16,8 @@ http://localhost:8080/api-docs
 SwaggerUI:
 http://localhost:8080/swagger-ui/index.html
 
-Endpoint:
+
+### Endpoint explanation:
 The endpoint to retrieve the products is located in the ProductController.java class, is a GET request that if successful, will return a Response Entity enveloping a Page with code 200 with all the ProductDto objects required.
 This response also indicates the "totalPages" and "totalElements", so the frontal or receiving part know how many pages and elements more can obtain with the same filter values.
 This endpoint can receive the following parameters:
@@ -18,18 +27,18 @@ This endpoint can receive the following parameters:
 * page (int, default is 0): indicates which page of the query result will be showed, starting from 0. For example, if the query could contain 20 objects, but the page size is set to 5, and the page parameter is set to 0, it will show the first 5 objects depending on the order. To retrieve the next 5 objects, the same query should be done but changing the page parameter to 1.
 * size (int, default is 5): indicates the number of objects showed per page
 			
-Example requests:
-(GET)
-http://localhost:8080/api/product/catalog?category=Home %26 Kitchen&sortBy=sku&ascending=true&page=0&size=5
+###Example requests:
 
-(GET)
-http://localhost:8080/api/product/catalog?category=Electronics&sortBy=description&ascending=true&page=0&size=5
+(GET):
 
-(GET)
-http://localhost:8080/api/product/catalog?sortBy=price&ascending=false&page=0&size=10
+		http://localhost:8080/api/product/catalog?category=Home %26 Kitchen&sortBy=sku&ascending=true&page=0&size=5
+
+		http://localhost:8080/api/product/catalog?category=Electronics&sortBy=description&ascending=true&page=0&size=5
+
+		http://localhost:8080/api/product/catalog?sortBy=price&ascending=false&page=0&size=10
 
 
-Brief explanation of architectural decisions:
+#### Brief explanation of architectural decisions:
 For this demo, I decided to make a typical Spring Boot application separated by Controller/Service/Repository annotated layers.
 * The controller class: focus on receiving the external requests and calls the service to make the required tasks.
 * The service class: manages the application logic: it calls the repository to get the producs, make calculations as the discounts and maps the object from entity to dto.
