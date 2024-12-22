@@ -24,12 +24,12 @@ public class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
-    @InjectMocks
     private ProductService productService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        productService = new ProductService(productRepository);
     }
 
     @Test

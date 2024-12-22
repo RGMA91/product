@@ -2,13 +2,21 @@ package com.example.product.mapper;
 
 import com.example.product.dto.ProductDto;
 import com.example.product.entity.Product;
+import com.example.product.mapper.strategy.DiscountStrategy;
+import com.example.product.mapper.strategy.implementation.CategoryDiscountStrategy;
+import com.example.product.mapper.strategy.implementation.CompositeDiscountStrategy;
+import com.example.product.mapper.strategy.implementation.SkuDiscountStrategy;
 import org.springframework.data.domain.Page;
+
+import java.util.Arrays;
 
 public class ProductMapper {
 
-    public static final String DISCOUNT_15 = "Electronics";
-    public static final String DISCOUNT_25 = "Home & Kitchen";
-    public static final String DISCOUNT_30 = "5";
+    private static final DiscountStrategy discountStrategy = new CompositeDiscountStrategy(Arrays.asList(
+            new CategoryDiscountStrategy(),
+            new SkuDiscountStrategy()
+    ));
+
     public static final String PERCENT = "%";
 
     public static Page<ProductDto> productPageToProductDtoPage(Page<Product> productsPage) {
@@ -20,7 +28,7 @@ public class ProductMapper {
             return null;
         }
 
-        int discount = calculateDiscount(product);
+        int discount = discountStrategy.calculateDiscount(product);
         Double priceAfterDiscount = calculatePriceAfterDiscount(product.getPrice(), discount);
 
         return ProductDto.builder()
@@ -35,20 +43,6 @@ public class ProductMapper {
 
     private static Double calculatePriceAfterDiscount(Double price, int discount) {
         return discount > 0 ? price - (price/100) * discount : price;
-    }
-
-    private static Integer calculateDiscount(Product product) {
-        int discount = 0;
-        if (product.getCategory() != null && product.getCategory().equals(DISCOUNT_15)) {
-            discount = 15;
-        }
-        if (product.getCategory() != null && product.getCategory().equals(DISCOUNT_25)) {
-            discount = 25;
-        }
-        if (product.getSku() != null && product.getSku().endsWith(DISCOUNT_30)){
-            discount = 30;
-        }
-        return discount;
     }
 
 }

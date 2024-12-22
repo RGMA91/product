@@ -21,13 +21,13 @@ http://localhost:8080/swagger-ui/index.html
 The endpoint to retrieve the products is located in the ProductController.java class, is a GET request that if successful, will return a Response Entity enveloping a Page with code 200 with all the ProductDto objects required.
 This response also indicates the "totalPages" and "totalElements", so the frontal or receiving part know how many pages and elements more can obtain with the same filter values.
 This endpoint can receive the following parameters:
-* category (string): its not required, if this parameter is not send, the application will search for all the categories.
-* sortBy (string): indicates the field in which the result will be sorted. It doesn't matter if it is in lower case or upper case, the service will standarize it to lower case. If this param is not SKU, Price, Description or Category, it will return a bad request
+* category (string): it's not required, if this parameter is not send, the application will search for all the categories.
+* sortBy (string): indicates the field in which the result will be sorted. It doesn't matter if it is in lower case or upper case, the service will standardize it to lower case. If this param is not SKU, Price, Description or Category, it will return a bad request
 * ascending (boolean, default is true): indicates if the order of the result will be sorted in ascending manner if the param is true or descending manner if it is false.
 * page (int, default is 0): indicates which page of the query result will be showed, starting from 0. For example, if the query could contain 20 objects, but the page size is set to 5, and the page parameter is set to 0, it will show the first 5 objects depending on the order. To retrieve the next 5 objects, the same query should be done but changing the page parameter to 1.
 * size (int, default is 5): indicates the number of objects showed per page
 			
-###Example requests:
+### Example requests:
 
 (GET):
 
@@ -42,9 +42,11 @@ This endpoint can receive the following parameters:
 For this demo, I decided to make a typical Spring Boot application separated by Controller/Service/Repository annotated layers.
 * The controller class: focus on receiving the external requests and calls the service to make the required tasks.
 * The service class: manages the application logic: it calls the repository to get the producs, make calculations as the discounts and maps the object from entity to dto.
-* The repository interface: extends the JPA repository, which facilitates the querying and connection with a database given an entity, in this case it retrieves the products in the database with a given Page objects which parametrizes the query
+* The mapper class is used inside the service, it maps the product page from the repository to a productDto page, the discount value is calculated with the DiscountStrategy implementations
+* The DiscountStrategy interface is used to define the product discount percentage, along the implementations, is based on the Strategy Pattern, so it can calculate the discount without violating the open/close principle (SOLID), so if a new discount condition is added, it is not necessary to create another if condition. 
+* The repository interface: extends the JPA repository, which facilitates the querying and connection with a database given an entity, in this case it retrieves the products in the database with a given Page objects which parametrizes the query.
 * Paging: given the case the user has to scroll or tap/click next while searching products on a given web front that shows the catalog, it would be very consuming to load the whole item inventory, so it is better to query by page as needed and increment the page number as the user clicks or scroll.
-* Product and ProductDTO difference: it is better that the Product entity, the class that receives the data from the database would be different than the objects returned by the service, this way you can show different data as needed to the final user, for example, in this case is not needed to show the product ID, also the discount is calculated in the service so the entity doesn't have this field and it needs to be calculated and added
-* ControllerAdvisor: it is used to control exceptions that a given endpoint in the controller can throw. In this case it is used to manage cases where a sortBy value could be incorrect, returning a 500 internal server error, which is better to manage as a 400 bad request indicating that the error was caused by a incorrect parameter
-* Database: a H2 database was used, so it is not necessary to create an external database to use the application. This database is created in runtime, is generated based on the file schema.sql and populated by the file data.sql. Configuration is in application.properties. It is also used for integration testing.
+* Product and ProductDTO difference: it is better that the Product entity, the class that receives the data from the database would be different than the objects returned by the service, this way you can show different data as needed to the final user, for example, in this case is not needed to show the product ID, also the discount is calculated in the service so the entity doesn't have this field, and it needs to be calculated and added
+* ControllerAdvisor: it is used to control exceptions that a given endpoint in the controller can throw. In this case it is used to manage cases where a sortBy value could be incorrect, returning a 500 internal server error, which is better to manage as a 400 bad request indicating that the error was caused by an incorrect parameter
+* Database: an H2 database was used, so it is not necessary to create an external database to use the application. This database is created in runtime, is generated based on the file schema.sql and populated by the file data.sql. Configuration is in application.properties. It is also used for integration testing.
 * Tests: Integration tests were made, covers from the controller to the repository layers and uses the same H2 database mentioned before. Unit tests were made for the service layer class and the mapper class that transforms Product to ProductDTO and Product Page to ProductDTO Page since those classes covers the calculating methods of the bussiness logic.
